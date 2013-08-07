@@ -38,27 +38,13 @@ class DataFrame(object):
             if l != lenseq[0]:
                 return 2013     # てきとう -- note: ちゃんと class E(Exception) 書く
 
-        #print 'debugwrite in DataFrame.__init__: dic =', dic
-        
         self.body = dict((k, np.array(v)) for k, v in dic.iteritems())
-
-        #print 'debugwrite in DataFrame.__init__: self.body =', self.body
-
         self.colnameseq = colnameseq
-
-        #print 'debugwrite in DataFrame.__init__: self.colnameseq =', self.colnameseq
 
     def __getitem__(self, colname):
         u"""辞書風の書式で書く列にアクセスできる。"""
 
-        #try:
-
         return self.body[colname]
-
-        #except Exception:
-        #    import pdb
-        #    pdb.set_trace()
-
 
     def sort_by(self, colname):
         u"""列名を与えて、その列に関して各データ(行)をソートしたデータフレームを返す。
@@ -82,10 +68,7 @@ class DataFrame(object):
 
         df = self.sort_by(colname) # あらかじめ colname でソートしておく。
         
-        def keyfunc(row):
-            return row[colname]
-
-        for k, g in itertools.groupby(df.gen_row(), keyfunc):
+        for k, g in itertools.groupby(df.gen_row(), lambda row: row[colname]):
             dic = dict((cn, []) for cn in self.colnameseq)
 
             for row in g:
@@ -100,7 +83,6 @@ class DataFrame(object):
 
         for j in range(self.nrow()):
             row_dic = dict((cn, self.body[cn][j]) for cn in self.colnameseq)
-            #print 'debugwrite in DataFrame.gen_row: row_dic =', row_dic
             yield row_dic
 
     def nrow(self):
