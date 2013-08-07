@@ -8,7 +8,26 @@ def cbind(*dfseq):
     u"""行数が同じである複数のデータフレームを渡された順番に結合した
     1つのデータフレームにして返す。
     """
-    pass
+    #df_res = DataFrame({}, [])
+    df_res = DataFrame()
+
+    print 'debugwrite in cbind 400:', df_res.colnameseq, df_res.body.keys()
+
+    for df in dfseq:
+        print 'debugwrite in cbind 500: df.colnameseq and df ='
+        print df.colnameseq
+        print df
+
+        for cn in df.colnameseq:
+            df_res.add_column(cn, df[cn])
+            print 'debugwrite in cbind 600: df_res ='
+            print df_res.colnameseq, df_res.body.keys()
+            print df_res
+
+    print df_res
+
+    return df_res
+
 
 def from_gen(gen, colnameseq):
     u"""タプルのジェネレータ gen からデータフレームを作る。
@@ -36,7 +55,8 @@ class DataFrame(object):
     列の順序は colnameseq によって保持される。
     """
 
-    def __init__(self, dic, colnameseq): # colnameseq は列名の順序を保持するのに必要
+    def __init__(self, dic = {}, colnameseq = []):
+        print 'debugwrite in DataFrame.__init__ 300:', colnameseq
 
         # 長さのチェック -- すべての列は同じ長さでなければならない。
         lenseq = [len(col) for col in dic.values()]
@@ -46,6 +66,8 @@ class DataFrame(object):
 
         self.body = dict((k, np.array(v)) for k, v in dic.iteritems())
         self.colnameseq = colnameseq
+
+        print 'debugwrite in DataFrame.__init__ 700:', colnameseq
 
     def __str__(self):
 
@@ -138,7 +160,8 @@ class DataFrame(object):
         u"""self に新しい列 newcol を加える。列名は newcolname.
         """
 
-        pass
+        self.colnameseq.append(newcolname)
+        self.body[newcolname] = newcol # np.array を渡すべし note: 改良の余地あり
 
 
 

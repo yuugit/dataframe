@@ -137,6 +137,52 @@ class TestDataFrame_from_gen(unittest.TestCase):
         nn = [n*n for n in range(30)]
         self.assertEqual(list(df['num*num']), nn)
 
+class TestDataFrame_cbind(unittest.TestCase):
+    def setUp(self):
+        dic1 = {'foo': [83, 72, 94, 61], 'bar': ['apple', 'banana', 'git', 'gist']}
+        df1 = dataframe.DataFrame(dic1, ['foo', 'bar'])
+
+        dic2 = {'job': ['Warrior', 'Priest', 'Mage', 'Thief'],
+                'power': [1500, 700, 500, 1000]}
+        df2 = dataframe.DataFrame(dic2, ['job', 'power'])
+
+        self.df = dataframe.cbind(df1, df2)
+
+    def test_has_colnameseq_merged(self):
+        u"""列名がマージされたことを確かめる。"""
+        self.assertEqual(self.df.colnameseq, ['foo', 'bar', 'job', 'power'])
+
+    def test_cbound_contents(self):
+        u"""cbindされたデータフレームの要素チェック"""
+
+        g = self.df.gen_row()
+
+        row = g.next()
+        self.assertEqual(row['foo'], 83)
+        self.assertEqual(row['bar'], 'apple')
+        self.assertEqual(row['job'], 'Warrior')
+        self.assertEqual(row['power'], 1500)
+
+        row = g.next()
+        self.assertEqual(row['foo'], 72)
+        self.assertEqual(row['bar'], 'banana')
+        self.assertEqual(row['job'], 'Priest')
+        self.assertEqual(row['power'], 700)
+        
+        row = g.next()
+        self.assertEqual(row['foo'], 94)
+        self.assertEqual(row['bar'], 'git')
+        self.assertEqual(row['job'], 'Mage')
+        self.assertEqual(row['power'], 500)
+        
+        row = g.next()
+        self.assertEqual(row['foo'], 61)
+        self.assertEqual(row['bar'], 'gist')
+        self.assertEqual(row['job'], 'Thief')
+        self.assertEqual(row['power'], 1000)
+        
+            
+
 
 if __name__ == '__main__':
     unittest.main()
