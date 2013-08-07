@@ -86,6 +86,8 @@ class DataFrame(object):
             yield row_dic
 
     def nrow(self):
+        u"""データフレームの行数を返す。"""
+
         return len(self.body[self.colnameseq[0]])
 
 
