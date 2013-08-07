@@ -19,7 +19,13 @@ def from_gen(gen, colnameseq):
     DataFrame.groupby で出てきた各サブセットに対し集計を行って、
     その集計値たちをジェネレータの形にしてこれに渡す、という風に使うつもり。
     """
-    pass
+
+    dic = dict((cn, []) for cn in colnameseq)
+    for tpl in gen:
+        for j, cn in enumerate(colnameseq):
+            dic[cn].append(tpl[j])
+
+    return DataFrame(dic, colnameseq)
 
 
 class DataFrame(object):
@@ -40,6 +46,43 @@ class DataFrame(object):
 
         self.body = dict((k, np.array(v)) for k, v in dic.iteritems())
         self.colnameseq = colnameseq
+
+    def __str__(self):
+
+        # 各列ごとに最大文字列長を計算する。
+        maxlenseq = []
+        for cn in self.colnameseq:
+            maxlen = len(cn)    # 列名の文字列長も考慮する。
+            for elem in self[cn]:
+                l = len(str(elem))
+                if maxlen < l:
+                    maxlen = l
+            maxlenseq.append(maxlen)
+
+        # フォーマットの規則
+        # - 各列は半角スペースで区切る。
+        # - 数値の場合は右寄せ、そうでなければ左寄せ。
+
+        # まず列名の行の文字列表現を作る。
+        sep = ' '
+        acc = [sep.join([cn.ljust(l) for cn, l in zip(self.colnameseq, maxlenseq)])]
+
+        # 各列の右寄せ or 左寄せを決める
+        just_seq = [('rjust' if np.alltrue(np.isreal(self.body[cn])) else 'ljust') \
+                        for cn in self.colnameseq]
+
+        # 各行の文字列表現を作る。
+        for row in self.gen_row():
+            line = []
+            for cn, l, just in zip(self.colnameseq, maxlenseq, just_seq):
+                justed = getattr(str(row[cn]), just)(l)
+                line.append(justed)
+
+            acc.append(' '.join(line))
+
+        # 各行をつなげて返す。
+        return '\n'.join(acc)
+
 
     def __getitem__(self, colname):
         u"""辞書風の書式で書く列にアクセスできる。"""
@@ -91,7 +134,10 @@ class DataFrame(object):
         return len(self.body[self.colnameseq[0]])
 
 
-    def add_column(self, colname, newcol):
+    def add_column(self, newcolname, newcol):
+        u"""self に新しい列 newcol を加える。列名は newcolname.
+        """
+
         pass
 
 

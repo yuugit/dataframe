@@ -32,6 +32,20 @@ class TestDataFrame_basic(unittest.TestCase):
 
         self.assertTrue(np.alltrue(df_sorted['bar'] == bar_sorted))
 
+    def test_str(self):
+        u"""__str__ で期待通りの文字列表現が得られることを確認する。"""
+
+        a = ['foo bar   ',
+             ' 83 apple ',
+             ' 72 banana',
+             ' 94 git   ',
+             ' 61 gist  ']
+
+        s = '\n'.join(a)
+
+        self.assertEqual(self.df.__str__(), s)
+
+
 # note: test suite について(？) http://docs.python.jp/2/library/unittest.html を読み、
 #       すべてのテストケースクラスのテストを実行させる。
 # ,,, クラス名が被って再代入が起きてただけでした。マヌケ。
@@ -109,7 +123,19 @@ class TestDataFrame_fromCSV(unittest.TestCase):
 
         self.assertEqual(list(df['nchar']), nchar)
         
+class TestDataFrame_from_gen(unittest.TestCase):
+    def setUp(self):
+        self.colnameseq = ['num', 'num*num', 'name']
+        words = ['a', 'b', 'c', 'd', 'e']
+        self.tuplegen = ((n, n*n, str(words[(n*n)%len(words)])) for n in range(30))
 
+    def test_from_gen(self):
+        df = dataframe.from_gen(self.tuplegen, self.colnameseq)
+
+        self.assertEqual(list(df['num']), range(30))
+
+        nn = [n*n for n in range(30)]
+        self.assertEqual(list(df['num*num']), nn)
 
 
 if __name__ == '__main__':

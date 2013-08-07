@@ -3,15 +3,58 @@
 import dataframe
 
 import itertools, StringIO
+import numpy as np
 
 
 def main():
     (options, args) = parse_options()
  
+    try_summary()
+
     #try_basic()
     #try_groupby()
-    try_fromCSV()
+    #try_fromCSV()
+    #try_from_gen()
     
+def try_summary():
+    u"""Rで
+      write.csv(iris, file = 'iris.csv', quote = F, row.names = F)
+    して作ったファイルを読んで、各種類ごとに
+      Sepal.Length, Sepal.Width, Petal.Length, Petal.Width
+    の平均値を計算する。"""
+
+    with open('iris.csv') as f:
+        df = dataframe.DataFrame_fromCSV(f, [float, float, float, float, str])
+
+    def g():
+        for level, df_subset in df.groupby('Species'):
+            yield (np.mean(df_subset['Sepal.Length']),
+                   np.mean(df_subset['Sepal.Width']),
+                   np.mean(df_subset['Petal.Length']),
+                   np.mean(df_subset['Petal.Width']),
+                   level)
+                   
+    summary_colnameseq = [
+        'mean.Sepal.Length',
+        'mean.Sepal.Width',
+        'mean.Petal.Length',
+        'mean.Petal.Width',
+        'Species']
+
+    df_summary = dataframe.from_gen(g(), summary_colnameseq)
+
+    print df_summary
+
+
+def try_from_gen():
+
+    colnameseq = ['num', 'num*num', 'name']
+    words = ['a', 'b', 'c', 'd', 'e']
+    tg = ((n, n*n, str(words[(n*n)%len(words)])) for n in range(30))
+
+    print dataframe.from_gen(tg, colnameseq).body
+
+
 def try_basic():
 
     dic = {'foo': [83, 72, 94, 61], 'bar': ['apple', 'banana', 'git', 'gist']}
