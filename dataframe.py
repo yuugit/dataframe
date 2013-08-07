@@ -97,22 +97,21 @@ class DataFrame(object):
 
 
 class DataFrame_fromCSV(DataFrame):
-    def __init__(self, csv_path, coltypeseq):
+    def __init__(self, fileobj, coltypeseq):
         u"""一行目が列名になっているCSVファイルを読み込んで
         データフレームを作る。
         """
 
-        with open(csv_path) as f:
-            reader = csv.reader(f)
+        reader = csv.reader(fileobj)
 
-            colnameseq = reader.next()
-            dic = dict((cn, []) for cn in colnameseq)
+        colnameseq = reader.next()
+        dic = dict((cn, []) for cn in colnameseq)
 
-            for row in reader:
-                for j, cn in enumerate(colnameseq):
-                    conv = coltypeseq[j]
-                    elem = row[j]
-                    dic[cn].append(conv(elem))
+        for row in reader:
+            for j, cn in enumerate(colnameseq):
+                conv = coltypeseq[j]
+                elem = row[j]
+                dic[cn].append(conv(elem))
 
         DataFrame.__init__(self, dic, colnameseq)
 

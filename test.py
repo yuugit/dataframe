@@ -5,6 +5,7 @@ import dataframe
 import unittest
 
 import numpy as np
+import StringIO
 
 
 # note: 列の長さが揃っていないとエラーになることを確かめる -- エラークラスを定義する。
@@ -77,6 +78,38 @@ class TestDataFrame_groupby(unittest.TestCase):
             elif lv == 1:
                 self.assertTrue(np.alltrue(df_subset['foo'] == [72, 94, 365]))
                 self.assertTrue(np.alltrue(df_subset['bar'] == ['banana', 'git', 'tick']))
+
+class TestDataFrame_fromCSV(unittest.TestCase):
+    def setUp(self):
+        s = u"""language,nchar
+        Python,6
+        Ruby,4
+        Perl,4
+        JavaScript,10
+        C,1
+        Haskell,7
+        C++,3
+        Common Lisp,11
+        Brainf*ck,9"""
+
+        s = '\n'.join([l.strip() for l in s.split('\n')])
+
+        self.f = StringIO.StringIO(s)
+        
+    def test_init(self):
+
+        df = dataframe.DataFrame_fromCSV(self.f, [str, int]).body
+
+        language = ['Python', 'Ruby', 'Perl', 'JavaScript', 'C',
+                    'Haskell', 'C++', 'Common Lisp', 'Brainf*ck']
+
+        self.assertEqual(list(df['language']), language)
+
+        nchar = [ 6,  4,  4, 10,  1,  7,  3, 11,  9]
+
+        self.assertEqual(list(df['nchar']), nchar)
+        
+
 
 
 if __name__ == '__main__':

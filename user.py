@@ -2,12 +2,18 @@
  
 import dataframe
 
-import itertools
+import itertools, StringIO
 
 
 def main():
     (options, args) = parse_options()
  
+    #try_basic()
+    #try_groupby()
+    try_fromCSV()
+    
+def try_basic():
+
     dic = {'foo': [83, 72, 94, 61], 'bar': ['apple', 'banana', 'git', 'gist']}
     df = dataframe.DataFrame(dic, ['foo', 'bar'])
 
@@ -16,8 +22,7 @@ def main():
 
     print dfs['bar']
 
-    try_groupby()
-    
+
 def try_groupby():
 
     dic = {'foo': [83, 72, 94, 61, 365, 128, 999],
@@ -35,6 +40,32 @@ def try_groupby():
         print
         print 'k =', k
         print 'list(g) =', list(g)
+
+
+def try_fromCSV():
+
+    s = u"""language,nchar
+    Python,6
+    Ruby,4
+    Perl,4
+    JavaScript,10
+    C,1
+    Haskell,7
+    C++,3
+    Common Lisp,11
+    Brainf*ck,9"""
+
+    s = '\n'.join([l.strip() for l in s.split('\n')])
+
+    print s, type(s)
+
+    f = StringIO.StringIO(s)
+
+    #for line in f:
+    #    print line
+
+    print dataframe.DataFrame_fromCSV(f, [str, int]).body
+
 
  
 def parse_options():
