@@ -8,23 +8,11 @@ def cbind(*dfseq):
     u"""行数が同じである複数のデータフレームを渡された順番に結合した
     1つのデータフレームにして返す。
     """
-    #df_res = DataFrame({}, [])
-    df_res = DataFrame()
-
-    print 'debugwrite in cbind 400:', df_res.colnameseq, df_res.body.keys()
+    df_res = DataFrame({}, [])  # 渡さないとだめっぽい -- デフォルト引数が効いてない？ note
 
     for df in dfseq:
-        print 'debugwrite in cbind 500: df.colnameseq and df ='
-        print df.colnameseq
-        print df
-
         for cn in df.colnameseq:
             df_res.add_column(cn, df[cn])
-            print 'debugwrite in cbind 600: df_res ='
-            print df_res.colnameseq, df_res.body.keys()
-            print df_res
-
-    print df_res
 
     return df_res
 
@@ -56,8 +44,6 @@ class DataFrame(object):
     """
 
     def __init__(self, dic = {}, colnameseq = []):
-        print 'debugwrite in DataFrame.__init__ 300:', colnameseq
-
         # 長さのチェック -- すべての列は同じ長さでなければならない。
         lenseq = [len(col) for col in dic.values()]
         for l in lenseq:
@@ -66,8 +52,6 @@ class DataFrame(object):
 
         self.body = dict((k, np.array(v)) for k, v in dic.iteritems())
         self.colnameseq = colnameseq
-
-        print 'debugwrite in DataFrame.__init__ 700:', colnameseq
 
     def __str__(self):
 
